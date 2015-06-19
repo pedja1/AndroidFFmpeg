@@ -63,12 +63,14 @@ public class VideoActivity extends Activity implements OnClickListener,
 	private static final String[] PROJECTION = new String[] {"title", BaseColumns._ID};
 	private static final int PROJECTION_ID = 1;
 
-	private FFmpegPlayer mMpegPlayer;
+	private FFmpegPlayer mMpegPlayer1;
+	private FFmpegPlayer mMpegPlayer2;
 	protected boolean mPlay = false;
 	private View mControlsView;
 	private View mLoadingView;
 	private SeekBar mSeekBar;
-	private View mVideoView;
+	private View mVideoView1;
+	private View mVideoView2;
 	private Button mPlayPauseButton;
 	private boolean mTracking = false;
 	private View mStreamsView;
@@ -134,9 +136,11 @@ public class VideoActivity extends Activity implements OnClickListener,
 		mSubtitleSpinner.setAdapter(mSubtitleAdapter);
 		mSubtitleSpinner.setOnItemSelectedListener(this);
 
-		mVideoView = this.findViewById(R.id.video_view);
-		mMpegPlayer = new FFmpegPlayer((FFmpegDisplay) mVideoView, this);
-		mMpegPlayer.setMpegListener(this);
+		mVideoView1 = this.findViewById(R.id.video_view1);
+		mVideoView2 = this.findViewById(R.id.video_view2);
+		mMpegPlayer1 = new FFmpegPlayer((FFmpegDisplay) mVideoView1, this);
+		mMpegPlayer2 = new FFmpegPlayer((FFmpegDisplay) mVideoView2, this);
+		mMpegPlayer1.setMpegListener(this);
 		setDataSource();
 	}
 
@@ -153,8 +157,9 @@ public class VideoActivity extends Activity implements OnClickListener,
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		this.mMpegPlayer.setMpegListener(null);
-		this.mMpegPlayer.stop();
+		this.mMpegPlayer1.setMpegListener(null);
+		this.mMpegPlayer1.stop();
+		this.mMpegPlayer2.stop();
 		stop();
 	}
 
@@ -192,7 +197,9 @@ public class VideoActivity extends Activity implements OnClickListener,
 		this.mPlayPauseButton.setEnabled(true);
 		mPlay = false;
 
-		mMpegPlayer.setDataSource(url, params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo,
+		mMpegPlayer1.setDataSource(url, params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo,
+				mSubtitleStreamNo);
+		mMpegPlayer2.setDataSource(url, params, FFmpegPlayer.UNKNOWN_STREAM, mAudioStreamNo,
 				mSubtitleStreamNo);
 
 	}
@@ -284,18 +291,18 @@ public class VideoActivity extends Activity implements OnClickListener,
 	@TargetApi(11)
 	private void displaySystemMenu11(boolean visible) {
 		if (visible) {
-			this.mVideoView.setSystemUiVisibility(View.STATUS_BAR_VISIBLE);
+			this.mVideoView1.setSystemUiVisibility(View.STATUS_BAR_VISIBLE);
 		} else {
-			this.mVideoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
+			this.mVideoView1.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
 		}
 	}
 
 	@TargetApi(14)
 	private void displaySystemMenu14(boolean visible) {
 		if (visible) {
-			this.mVideoView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+			this.mVideoView1.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 		} else {
-			this.mVideoView
+			this.mVideoView1
 					.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 		}
 	}
@@ -303,9 +310,11 @@ public class VideoActivity extends Activity implements OnClickListener,
 	public void resumePause() {
 		this.mPlayPauseButton.setEnabled(false);
 		if (mPlay) {
-			mMpegPlayer.pause();
+			mMpegPlayer1.pause();
+			mMpegPlayer2.pause();
 		} else {
-			mMpegPlayer.resume();
+			mMpegPlayer1.resume();
+			mMpegPlayer2.resume();
 			displaySystemMenu(true);
 		}
 		mPlay = !mPlay;
@@ -350,7 +359,8 @@ public class VideoActivity extends Activity implements OnClickListener,
 			boolean fromUser) {
 		if (fromUser) {
 			long timeUs = progress * 1000 * 1000;
-			mMpegPlayer.seek(timeUs);
+			mMpegPlayer1.seek(timeUs);
+			mMpegPlayer2.seek(timeUs);
 		}
 	}
 
@@ -366,8 +376,10 @@ public class VideoActivity extends Activity implements OnClickListener,
 	
 	private void setDataSourceAndResumeState() {
 		setDataSource();
-		mMpegPlayer.seek(mCurrentTimeUs);
-		mMpegPlayer.resume();
+		mMpegPlayer1.seek(mCurrentTimeUs);
+		mMpegPlayer1.resume();
+		mMpegPlayer2.seek(mCurrentTimeUs);
+		mMpegPlayer2.resume();
 	}
 
 	@Override
