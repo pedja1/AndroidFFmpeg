@@ -20,8 +20,9 @@ if [ "$NDK" = "" ]; then
 	echo "Use: export NDK=/your/path/to/android-ndk"
 	exit 1
 fi
+clean=0
 
-OS_ARCH=`basename $NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/*`
+OS_ARCH=`basename $NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64`
 function build_x264
 {
 	PLATFORM=$NDK/platforms/$PLATFORM_VERSION/arch-$ARCH/
@@ -44,7 +45,9 @@ function build_x264
 	cd x264
 	./configure --prefix=$(pwd)/$PREFIX --host=$ARCH-linux --enable-static $ADDITIONAL_CONFIGURE_FLAG || exit 1
 
-	make clean || exit 1
+	if (( $clean == 1 )) ; then
+		make clean || exit 1
+	fi
 	make -j4 install || exit 1
 	cd ..
 }
@@ -78,7 +81,9 @@ function build_amr
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
 
-	make clean || exit 1
+	if (( $clean == 1 )) ; then
+		make clean || exit 1
+	fi
 	make -j4 install || exit 1
 	cd ..
 }
@@ -114,7 +119,9 @@ function build_aac
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
 
-	make clean || exit 1
+	if (( $clean == 1 )) ; then
+		make clean || exit 1
+	fi
 	make -j4 install || exit 1
 	cd ..
 }
@@ -149,7 +156,9 @@ function build_freetype2
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
 
-	make clean || exit 1
+	if (( $clean == 1 )) ; then
+		make clean || exit 1
+	fi
 	make -j4 install || exit 1
 	cd ..
 }
@@ -185,7 +194,9 @@ function build_ass
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
 
-	make clean || exit 1
+	if (( $clean == 1 )) ; then
+		make clean || exit 1
+	fi
 	make V=1 -j4 install || exit 1
 	cd ..
 }
@@ -219,7 +230,9 @@ function build_fribidi
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
 
-	make clean || exit 1
+	if (( $clean == 1 )) ; then
+		make clean || exit 1
+	fi
 	make -j4 install || exit 1
 	cd ..
 }
@@ -334,7 +347,9 @@ EOF
 	    --enable-asm \
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
-	make clean || exit 1
+	if (( $clean == 1 )) ; then
+		make clean || exit 1
+	fi
 	make -j4 install || exit 1
 
 	cd ..
@@ -343,10 +358,10 @@ EOF
 function build_one {
 	cd ffmpeg
 	PLATFORM=$NDK/platforms/$PLATFORM_VERSION/arch-$ARCH/
-	$PREBUILT/bin/$EABIARCH-ld -rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -L$PREFIX/lib  -soname $SONAME -shared -nostdlib  -z,noexecstack -Bsymbolic --whole-archive --no-undefined -o $OUT_LIBRARY -lavcodec -lavformat -lavresample -lavutil -lswresample -lass -lfreetype -lfribidi -lswscale -lvo-aacenc -lvo-amrwbenc -lc -lm -lz -ldl -llog  --warn-once  --dynamic-linker=/system/bin/linker -zmuldefs $PREBUILT/lib/gcc/$EABIARCH/4.4.3/libgcc.a || exit 1
+	$PREBUILT/bin/$EABIARCH-ld -rpath-link=$PLATFORM/usr/lib -L$PLATFORM/usr/lib -L$PREFIX/lib  -soname $SONAME -shared -nostdlib  -z noexecstack -Bsymbolic --whole-archive --no-undefined -o $OUT_LIBRARY -lavcodec -lavformat -lavresample -lavutil -lswresample -lass -lfreetype -lfribidi -lswscale -lvo-aacenc -lvo-amrwbenc -lc -lm -lz -ldl -llog --dynamic-linker=/system/bin/linker -zmuldefs $PREBUILT/lib/gcc/$EABIARCH/4.9/libgcc.a || exit 1
 	cd ..
 }
-
+: <<'END'
 #arm v5
 EABIARCH=arm-linux-androideabi
 ARCH=arm
@@ -356,7 +371,7 @@ PREFIX=../ffmpeg-build/armeabi
 OUT_LIBRARY=$PREFIX/libffmpeg.so
 ADDITIONAL_CONFIGURE_FLAG=
 SONAME=libffmpeg.so
-PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$OS_ARCH
+PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS_ARCH
 PLATFORM_VERSION=android-5
 build_amr
 build_aac
@@ -374,7 +389,7 @@ PREFIX=../ffmpeg-build/x86
 OUT_LIBRARY=$PREFIX/libffmpeg.so
 ADDITIONAL_CONFIGURE_FLAG=--disable-asm
 SONAME=libffmpeg.so
-PREBUILT=$NDK/toolchains/x86-4.4.3/prebuilt/$OS_ARCH
+PREBUILT=$NDK/toolchains/x86-4.9/prebuilt/$OS_ARCH
 PLATFORM_VERSION=android-9
 build_amr
 build_aac
@@ -392,7 +407,7 @@ PREFIX=../ffmpeg-build/mips
 OUT_LIBRARY=$PREFIX/libffmpeg.so
 ADDITIONAL_CONFIGURE_FLAG="--disable-mips32r2"
 SONAME=libffmpeg.so
-PREBUILT=$NDK/toolchains/mipsel-linux-android-4.4.3/prebuilt/$OS_ARCH
+PREBUILT=$NDK/toolchains/mipsel-linux-android-4.9/prebuilt/$OS_ARCH
 PLATFORM_VERSION=android-9
 build_amr
 build_aac
@@ -401,7 +416,7 @@ build_freetype2
 build_ass
 build_ffmpeg
 build_one
-
+END
 #arm v7vfpv3
 EABIARCH=arm-linux-androideabi
 ARCH=arm
@@ -411,8 +426,8 @@ PREFIX=../ffmpeg-build/armeabi-v7a
 OUT_LIBRARY=$PREFIX/libffmpeg.so
 ADDITIONAL_CONFIGURE_FLAG=
 SONAME=libffmpeg.so
-PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$OS_ARCH
-PLATFORM_VERSION=android-5
+PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS_ARCH
+PLATFORM_VERSION=android-21
 build_amr
 build_aac
 build_fribidi
@@ -430,8 +445,8 @@ PREFIX=../ffmpeg-build/armeabi-v7a-neon
 OUT_LIBRARY=../ffmpeg-build/armeabi-v7a/libffmpeg-neon.so
 ADDITIONAL_CONFIGURE_FLAG=--enable-neon
 SONAME=libffmpeg-neon.so
-PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$OS_ARCH
-PLATFORM_VERSION=android-9
+PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS_ARCH
+PLATFORM_VERSION=android-21
 build_amr
 build_aac
 build_fribidi
