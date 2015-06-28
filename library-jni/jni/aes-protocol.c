@@ -184,7 +184,7 @@ static int64_t aes_seek(URLContext *h, int64_t pos, int whence) {
 		return c->stream_end;
 
 	case SEEK_END:
-		LOGI(3, "aes_seek: pos: %d, SEEK_END", pos);
+		LOGI(3, "aes_seek: pos: %d, SEEK_END", (int)pos);
 		// The offset is set to the size of the file plus offset bytes.
 		if (c->stream_end < 0) {
 			c->stream_end = ffurl_seek(c->hd, 0, AVSEEK_SIZE);
@@ -303,5 +303,5 @@ URLProtocol aes_protocol = { .name = "aes", .url_open = aes_open, .url_read =
 		.flags = URL_PROTOCOL_FLAG_NESTED_SCHEME, };
 
 void register_aes_protocol() {
-	ffurl_register_protocol(&aes_protocol, sizeof(aes_protocol));
+	ffurl_register_protocol(&aes_protocol);
 }

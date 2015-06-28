@@ -78,6 +78,7 @@
 #define MIN_SLEEP_TIME_US 1000ll
 
 #define AUDIO_TIME_ADJUST_US -200000ll
+#define AVCODEC_MAX_AUDIO_FRAME_SIZE 192000
 
 //#define MEASURE_TIME
 
@@ -513,9 +514,9 @@ static void player_print_subtitle(AVSubtitle *sub, int64_t time) {
 				rect->nb_colors);
 		LOGI(3, "player_decode_subtitles --rect->text = %s", rect->text);
 		LOGI(3, "player_decode_subtitles --rect->ass = %s", rect->ass);
-		LOGI(3,
+		/*LOGI(3,
 				"player_decode_subtitles --rect->forced = %s",
-				rect->forced ? "true" : "false");
+				rect->forced ? "true" : "false");*/
 		char *type = "undefined";
 		if (rect->type == SUBTITLE_NONE) {
 			type = "none";
@@ -739,7 +740,7 @@ enum WaitFuncRet player_wait_for_frame(struct Player *player, int64_t stream_tim
 				"player_wait_for_frame[%d] Waiting for frame: sleeping: %" SCNd64,
 				stream_no, sleep_time);
 
-		if (sleep_time < -300000ll) {
+		/*if (sleep_time < -300000ll) {
 			// 300 ms late
 			int64_t new_value = player->start_time - sleep_time;
 
@@ -750,7 +751,7 @@ enum WaitFuncRet player_wait_for_frame(struct Player *player, int64_t stream_tim
 
 			player->start_time = new_value;
 			pthread_cond_broadcast(&player->cond_queue);
-		}
+		}*/
 
 		if (sleep_time <= MIN_SLEEP_TIME_US) {
 			// We do not need to wait if time is slower then minimal sleep time

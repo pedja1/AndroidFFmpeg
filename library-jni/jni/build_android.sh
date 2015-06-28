@@ -20,7 +20,7 @@ if [ "$NDK" = "" ]; then
 	echo "Use: export NDK=/your/path/to/android-ndk"
 	exit 1
 fi
-clean=0
+clean="clean"
 
 OS_ARCH=`basename $NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64`
 function build_x264
@@ -45,9 +45,12 @@ function build_x264
 	cd x264
 	./configure --prefix=$(pwd)/$PREFIX --host=$ARCH-linux --enable-static $ADDITIONAL_CONFIGURE_FLAG || exit 1
 
-	if (( $clean == 1 )) ; then
-		make clean || exit 1
-	fi
+	for i in "$@" ; do
+	    if [[ $i == $clean ]] ; then
+	        make clean || exit 1
+	        break
+	    fi
+	done
 	make -j4 install || exit 1
 	cd ..
 }
@@ -81,9 +84,12 @@ function build_amr
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
 
-	if (( $clean == 1 )) ; then
-		make clean || exit 1
-	fi
+	for i in "$@" ; do
+	    if [[ $i == $clean ]] ; then
+	        make clean || exit 1
+	        break
+	    fi
+	done
 	make -j4 install || exit 1
 	cd ..
 }
@@ -119,9 +125,12 @@ function build_aac
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
 
-	if (( $clean == 1 )) ; then
-		make clean || exit 1
-	fi
+	for i in "$@" ; do
+	    if [[ $i == $clean ]] ; then
+	        make clean || exit 1
+	        break
+	    fi
+	done
 	make -j4 install || exit 1
 	cd ..
 }
@@ -156,9 +165,12 @@ function build_freetype2
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
 
-	if (( $clean == 1 )) ; then
-		make clean || exit 1
-	fi
+	for i in "$@" ; do
+	    if [[ $i == $clean ]] ; then
+	        make clean || exit 1
+	        break
+	    fi
+	done
 	make -j4 install || exit 1
 	cd ..
 }
@@ -194,9 +206,12 @@ function build_ass
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
 
-	if (( $clean == 1 )) ; then
-		make clean || exit 1
-	fi
+	for i in "$@" ; do
+	    if [[ $i == $clean ]] ; then
+	        make clean || exit 1
+	        break
+	    fi
+	done
 	make V=1 -j4 install || exit 1
 	cd ..
 }
@@ -230,9 +245,12 @@ function build_fribidi
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
 
-	if (( $clean == 1 )) ; then
-		make clean || exit 1
-	fi
+	for i in "$@" ; do
+	    if [[ $i == $clean ]] ; then
+	        make clean || exit 1
+	        break
+	    fi
+	done
 	make -j4 install || exit 1
 	cd ..
 }
@@ -347,9 +365,12 @@ EOF
 	    --enable-asm \
 	    $ADDITIONAL_CONFIGURE_FLAG \
 	    || exit 1
-	if (( $clean == 1 )) ; then
-		make clean || exit 1
-	fi
+	for i in "$@" ; do
+	    if [[ $i == $clean ]] ; then
+	        make clean || exit 1
+	        break
+	    fi
+	done
 	make -j4 install || exit 1
 
 	cd ..
@@ -427,7 +448,7 @@ OUT_LIBRARY=$PREFIX/libffmpeg.so
 ADDITIONAL_CONFIGURE_FLAG=
 SONAME=libffmpeg.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS_ARCH
-PLATFORM_VERSION=android-21
+PLATFORM_VERSION=android-14
 build_amr
 build_aac
 build_fribidi
@@ -446,7 +467,7 @@ OUT_LIBRARY=../ffmpeg-build/armeabi-v7a/libffmpeg-neon.so
 ADDITIONAL_CONFIGURE_FLAG=--enable-neon
 SONAME=libffmpeg-neon.so
 PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$OS_ARCH
-PLATFORM_VERSION=android-21
+PLATFORM_VERSION=android-14
 build_amr
 build_aac
 build_fribidi
